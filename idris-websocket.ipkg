@@ -1,0 +1,9 @@
+package idris-websocket
+
+author = Paul Weaver <paul@dconcertdaw.co.uk>
+brief = "A simple client-side WebSocket library for Idris"
+version = 0.0.0
+
+sourcedir = src
+
+modules = WebSocket
