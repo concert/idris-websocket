@@ -32,6 +32,7 @@ Event = JsPtr "Event"
 MkEvent : Ptr -> Event
 MkEvent = MkJsPtr
 
+public export
 WebSocket : Type
 WebSocket = JsPtr "WebSocket"
 
