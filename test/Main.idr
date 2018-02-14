@@ -5,7 +5,7 @@ import WebSocket
 main : JS_IO ()
 main = do
   ws <- websocket.new $ MkUrl "wss" "echo.websocket.org"
-  consoleLog' (wsPtr ws)
+  -- consoleLog' ws
   websocket.onOpen ws $ \_ => do
     consoleLog "woot opened"
     websocket.onClose ws $ const $ consoleLog "aaand closed"

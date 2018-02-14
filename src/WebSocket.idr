@@ -20,14 +20,23 @@ Cast Url String where
 Protocol : Type
 Protocol = String
 
-record Event where
-  constructor MkEvent
-  ePtr : Ptr
+data JsPtr : String -> Type where
+  MkJsPtr : Ptr -> JsPtr x
 
-public export
-record WebSocket where
-  constructor MkWebSocket
-  wsPtr : Ptr
+jsPtr : JsPtr x -> Ptr
+jsPtr (MkJsPtr ptr) = ptr
+
+Event : Type
+Event = JsPtr "Event"
+
+MkEvent : Ptr -> Event
+MkEvent = MkJsPtr
+
+WebSocket : Type
+WebSocket = JsPtr "WebSocket"
+
+MkWebSocket : Ptr -> WebSocket
+MkWebSocket = MkJsPtr
 
 namespace websocket
   new : Url -> JS_IO WebSocket
@@ -36,28 +45,28 @@ namespace websocket
   onOpen : WebSocket -> (String -> JS_IO ()) -> JS_IO ()
   onOpen ws f =
     jscall "%0.onopen = %1" (Ptr -> JsFn (String -> JS_IO ()) -> JS_IO ())
-    (wsPtr ws) (MkJsFn f)
+    (jsPtr ws) (MkJsFn f)
 
   onError : ()
   onError = ?onErrorRHS
 
   send : WebSocket -> String -> JS_IO ()
-  send ws = jscall "%0.send(%1)" (Ptr -> String -> JS_IO ()) (wsPtr ws)
+  send ws = jscall "%0.send(%1)" (Ptr -> String -> JS_IO ()) (jsPtr ws)
 
   onMessage : WebSocket -> (String -> JS_IO ()) -> JS_IO ()
   onMessage ws f =
     jscall "%0.onmessage = function(event){%1(event.data)}" (Ptr -> JsFn (String -> JS_IO ()) -> JS_IO ())
-    (wsPtr ws) (MkJsFn f)
+    (jsPtr ws) (MkJsFn f)
 
   onClose : WebSocket -> (Ptr -> JS_IO ()) -> JS_IO ()
   onClose ws f = jscall "%0.onclose = %1" (Ptr -> JsFn (Ptr -> JS_IO ()) -> JS_IO ())
-    (wsPtr ws) (MkJsFn f)
+    (jsPtr ws) (MkJsFn f)
 
   close : WebSocket -> JS_IO ()
-  close = jscall "%0.close()" (Ptr -> JS_IO ()) . wsPtr
+  close = jscall "%0.close()" (Ptr -> JS_IO ()) . jsPtr
 
 consoleLog : String -> JS_IO ()
 consoleLog = jscall "console.log(%0)" (String -> JS_IO ())
 
-consoleLog' : Ptr -> JS_IO ()
-consoleLog' = jscall "console.log(%0)" (Ptr -> JS_IO ())
+consoleLog' : JsPtr x -> JS_IO ()
+consoleLog' = jscall "console.log(%0)" (Ptr -> JS_IO ()) . jsPtr
